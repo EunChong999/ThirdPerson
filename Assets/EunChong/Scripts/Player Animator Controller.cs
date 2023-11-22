@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class PlayerAnimatorController : MonoBehaviour
 {
-    [SerializeField] private Animator anim;
+    [SerializeField] Animator anim;
 
-    [SerializeField] private bool walk;
-    [SerializeField] private bool run;
-    [SerializeField] private bool walkToStop;
-    [SerializeField] private bool runToStop;
+    [SerializeField] bool walk;
+    [SerializeField] bool run;
+    [SerializeField] bool walkToStop;
+    [SerializeField] bool runToStop;
 
     private void Update()
     {

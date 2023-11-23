@@ -16,8 +16,8 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] Transform orientation;
 
-    float horizontalInput;
-    float verticalInput;
+    [HideInInspector] public float horizontalInput;
+    [HideInInspector] public float verticalInput;
 
     Vector3 moveDirection;
 
@@ -40,7 +40,7 @@ public class PlayerMovementController : MonoBehaviour
 
         MyInput();
 
-
+        ControlSpeed();
 
         HandleDrag();
     }
@@ -64,9 +64,15 @@ public class PlayerMovementController : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
     }
 
-    private void Rotate()
+    private void ControlSpeed()
     {
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
+        if (flatVel.magnitude > walkSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * walkSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
     }
 
     private void FixedUpdate()
@@ -80,6 +86,6 @@ public class PlayerMovementController : MonoBehaviour
 
         moveDirection.Normalize();
 
-        rb.AddForce(moveDirection.normalized * walkSpeed * 100 * Time.deltaTime, ForceMode.Force);
+        rb.AddForce(moveDirection.normalized * walkSpeed * 10, ForceMode.Force);
     }
 }

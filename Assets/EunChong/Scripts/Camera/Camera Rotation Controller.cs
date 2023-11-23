@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCameraController : MonoBehaviour
+public class CameraRotationController : MonoBehaviour
 {
     [SerializeField] float sensX;
     [SerializeField] float sensY;
@@ -28,12 +28,12 @@ public class PlayerCameraController : MonoBehaviour
 
     private void Update()
     {
-        MouseInput();
+        MyInput();
 
         Rotate();
     }
 
-    private void MouseInput()
+    private void MyInput()
     {
         mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
         mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;

@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraMovementController : MonoBehaviour
+public class CameraPositionController : MonoBehaviour
 {
     [SerializeField] Transform camPos;
 
     private void Update()
     {
-        CamPosInit();
+        CamPose();
     }
 
-    private void CamPosInit()
+    private void CamPose()
     {
         transform.position = camPos.position;
     }

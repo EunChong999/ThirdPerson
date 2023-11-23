@@ -9,6 +9,14 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] float groundDrag;
 
+    [SerializeField] float jumpForce;
+    [SerializeField] float jumpCooldown;
+    [SerializeField] float airMultiplier;
+    [SerializeField] bool readyToJump;
+
+    [Header("Keybinds")]
+    [SerializeField] KeyCode jumpKey = KeyCode.Space;
+
     [Header("Ground Check")]
     [SerializeField] float playerHeight;
     [SerializeField] LayerMask whatIsGround;
@@ -62,6 +70,15 @@ public class PlayerMovementController : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        {
+            readyToJump = false;
+
+            Jump();
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
     }
 
     private void ControlSpeed()
@@ -75,6 +92,25 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
+    private void Jump()
+    {
+        if (horizontalInput != 0 || verticalInput != 0)
+        {
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+        }
+
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private void ResetJump()
+    {
+        readyToJump = true;
+    }
+
     private void FixedUpdate()
     {
         Move();
@@ -86,6 +122,10 @@ public class PlayerMovementController : MonoBehaviour
 
         moveDirection.Normalize();
 
-        rb.AddForce(moveDirection.normalized * walkSpeed * 10, ForceMode.Force);
+        if (grounded) 
+            rb.AddForce(moveDirection.normalized * walkSpeed * 10, ForceMode.Force);
+
+        else
+            rb.AddForce(moveDirection.normalized * walkSpeed * 10 * airMultiplier, ForceMode.Force);
     }
 }

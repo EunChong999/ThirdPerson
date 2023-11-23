@@ -12,8 +12,6 @@ public class CameraRotationController : MonoBehaviour
 
     [SerializeField] float rotationSpeed;
 
-    [SerializeField] Transform combatLookAt;
-
     public CameraStyle currentStyle;
 
     public enum CameraStyle
@@ -46,7 +44,7 @@ public class CameraRotationController : MonoBehaviour
 
         else if (currentStyle == CameraStyle.Combat)
         {
-            Vector3 dirToCombatLookAt = combatLookAt.position - new Vector3(transform.position.x, combatLookAt.position.y, transform.position.z);
+            Vector3 dirToCombatLookAt = orientation.position - new Vector3(transform.position.x, orientation.position.y, transform.position.z);
             orientation.forward = dirToCombatLookAt.normalized;
 
             playerObj.forward = dirToCombatLookAt.normalized;

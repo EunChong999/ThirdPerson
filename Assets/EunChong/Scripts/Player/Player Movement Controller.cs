@@ -44,6 +44,8 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Update()
     {
+        ManageState();
+
         GroundCheck();
 
         MyInput();
@@ -51,6 +53,18 @@ public class PlayerMovementController : MonoBehaviour
         ControlSpeed();
 
         HandleDrag();
+    }
+
+    private void ManageState()
+    {
+        if (grounded && (horizontalInput != 0 || verticalInput != 0)) 
+        {
+            PlayerAnimationController.Instance.run = true;
+        }
+        else
+        {
+            PlayerAnimationController.Instance.run = false;
+        }
     }
 
     private void GroundCheck()
@@ -122,10 +136,13 @@ public class PlayerMovementController : MonoBehaviour
 
         moveDirection.Normalize();
 
-        if (grounded) 
+        if (grounded)
+        {
             rb.AddForce(moveDirection.normalized * walkSpeed * 10, ForceMode.Force);
-
+        }
         else
+        {
             rb.AddForce(moveDirection.normalized * walkSpeed * 10 * airMultiplier, ForceMode.Force);
+        }
     }
 }

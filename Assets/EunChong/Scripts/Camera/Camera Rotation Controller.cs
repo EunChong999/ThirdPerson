@@ -4,23 +4,26 @@ using UnityEngine;
 
 public class CameraRotationController : MonoBehaviour
 {
-    [SerializeField] float sensX;
-    [SerializeField] float sensY;
-
+    [Header("References")]
     [SerializeField] Transform orientation;
+    [SerializeField] Transform player;
+    [SerializeField] Transform playerObj;
+    [SerializeField] Rigidbody rb;
 
-    float mouseX;
-    float mouseY;
+    [SerializeField] float rotationSpeed;
 
-    float xRotation;
-    float yRotation;
+    [SerializeField] Transform combatLookAt;
 
-    private void Start()
+    public CameraStyle currentStyle;
+
+    public enum CameraStyle
     {
-        CursorInit();
+        Basic,
+        Combat,
+        Topdown
     }
 
-    private void CursorInit()
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -28,25 +31,25 @@ public class CameraRotationController : MonoBehaviour
 
     private void Update()
     {
-        MyInput();
+        Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
+        orientation.forward = viewDir.normalized;
 
-        Rotate();
-    }
+        if (currentStyle == CameraStyle.Basic)
+        {
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float verticalInput = Input.GetAxis("Vertical");
+            Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-    private void MyInput()
-    {
-        mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
-        mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;
-    }
+            if (inputDir != Vector3.zero)
+                playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+        }
 
-    private void Rotate()
-    {
-        yRotation += mouseX;
-        xRotation -= mouseY;
+        else if (currentStyle == CameraStyle.Combat)
+        {
+            Vector3 dirToCombatLookAt = combatLookAt.position - new Vector3(transform.position.x, combatLookAt.position.y, transform.position.z);
+            orientation.forward = dirToCombatLookAt.normalized;
 
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
-
-        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
-        orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+            playerObj.forward = dirToCombatLookAt.normalized;
+        }
     }
 }

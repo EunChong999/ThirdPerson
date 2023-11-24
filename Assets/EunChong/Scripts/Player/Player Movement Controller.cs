@@ -13,6 +13,10 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
     [SerializeField] bool readyToJump;
+    [SerializeField] bool isStopping;
+
+    [SerializeField] Transform walkToStopPos;
+    [SerializeField] Transform runToStopPos;
 
     [Header("Keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
@@ -57,14 +61,41 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ManageState()
     {
-        if (grounded && (horizontalInput != 0 || verticalInput != 0)) 
+        if (grounded && !isStopping) 
         {
-            PlayerAnimationController.Instance.run = true;
+            if(!Input.GetKey(KeyCode.W) &&
+               !Input.GetKey(KeyCode.A) &&
+               !Input.GetKey(KeyCode.S) &&
+               !Input.GetKey(KeyCode.D))
+            {
+                if (Input.GetKeyUp(KeyCode.W) ||
+                    Input.GetKeyUp(KeyCode.A) ||
+                    Input.GetKeyUp(KeyCode.S) ||
+                    Input.GetKeyUp(KeyCode.D))
+                {
+                    WalkToStop();
+                }
+            }
+        }
+
+        if (grounded && !isStopping && (horizontalInput != 0 || verticalInput != 0)) 
+        {
+            Walk(true);
         }
         else
         {
-            PlayerAnimationController.Instance.run = false;
+            Walk(false);
         }
+    }
+
+    private void Walk(bool isWalk)
+    {
+        PlayerAnimationController.Instance.walk = isWalk;
+    }
+
+    private void WalkToStop()
+    {
+        PlayerAnimationController.Instance.walkToStop = true;
     }
 
     private void GroundCheck()

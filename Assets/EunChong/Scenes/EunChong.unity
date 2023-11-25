@@ -136,12 +136,12 @@ GameObject:
   - component: {fileID: 2860821}
   - component: {fileID: 2860820}
   m_Layer: 6
-  m_Name: Cube
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &2860820
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -894,8 +894,6 @@ MonoBehaviour:
   anim: {fileID: 347952724}
   walk: 0
   run: 0
-  walkToStop: 0
-  runToStop: 0
 --- !u!54 &266670998
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -942,8 +940,6 @@ MonoBehaviour:
   airMultiplier: 0.4
   readyToJump: 1
   isStopping: 0
-  walkToStopPos: {fileID: 0}
-  runToStopPos: {fileID: 0}
   jumpKey: 32
   playerHeight: 2
   whatIsGround:
@@ -3084,7 +3080,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1326308965}
-  m_LocalRotation: {x: 0.38268343, y: -0.000000015896624, z: 0.0000000065845964, w: 0.92387956}
+  m_LocalRotation: {x: 0.38268343, y: -0.000000015896623, z: 0.000000006584596, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

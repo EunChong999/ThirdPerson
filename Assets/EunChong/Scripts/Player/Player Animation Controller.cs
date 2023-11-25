@@ -8,8 +8,6 @@ public class PlayerAnimationController : MonoBehaviour
 
     public bool walk;
     public bool run;
-    public bool walkToStop;
-    public bool runToStop;
 
     private void Update()
     {
@@ -37,20 +35,6 @@ public class PlayerAnimationController : MonoBehaviour
         else
         {
             PlayRunAnim(false);
-        }
-        #endregion
-
-        #region WalkToStop
-        if (walkToStop)
-        {
-            PlayWalkToStopAnim();
-        }
-        #endregion
-
-        #region RunToStop
-        if (runToStop)
-        {
-            PlayRunToStopAnim();
         }
         #endregion
     }
@@ -99,19 +83,5 @@ public class PlayerAnimationController : MonoBehaviour
         {
             anim.SetBool("Run", false);
         }
-    }
-
-    private void PlayWalkToStopAnim()
-    {
-        anim.SetTrigger("Walk To Stop");
-
-        walkToStop = false;
-    }
-
-    private void PlayRunToStopAnim()
-    {
-        anim.SetTrigger("Run To Stop");
-
-        runToStop = false;
     }
 }

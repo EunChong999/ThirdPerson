@@ -15,9 +15,6 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] bool readyToJump;
     [SerializeField] bool isStopping;
 
-    [SerializeField] Transform walkToStopPos;
-    [SerializeField] Transform runToStopPos;
-
     [Header("Keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
 
@@ -34,6 +31,28 @@ public class PlayerMovementController : MonoBehaviour
     Vector3 moveDirection;
 
     Rigidbody rb;
+
+    private static PlayerMovementController instance = null;
+
+    void Awake()
+    {
+        if (null == instance)
+        {
+            instance = this;
+        }
+    }
+
+    public static PlayerMovementController Instance
+    {
+        get
+        {
+            if (null == instance)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
 
     private void Start()
     {
@@ -61,21 +80,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ManageState()
     {
-        if (grounded && !isStopping) 
-        {
-            if(!Input.GetKey(KeyCode.W) &&
-               !Input.GetKey(KeyCode.A) &&
-               !Input.GetKey(KeyCode.S) &&
-               !Input.GetKey(KeyCode.D))
-            {
-                if (Input.GetKeyUp(KeyCode.W))
-                {
-                    WalkToStop();
-                }
-            }
-        }
-
-        if (grounded && !isStopping && (horizontalInput != 0 || verticalInput != 0)) 
+        if (grounded && (horizontalInput != 0 || verticalInput != 0)) 
         {
             Walk(true);
         }
@@ -88,11 +93,6 @@ public class PlayerMovementController : MonoBehaviour
     private void Walk(bool isWalk)
     {
         PlayerAnimationController.Instance.walk = isWalk;
-    }
-
-    private void WalkToStop()
-    {
-        PlayerAnimationController.Instance.walkToStop = true;
     }
 
     private void GroundCheck()

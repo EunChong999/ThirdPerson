@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static PlayerMovementController;
 
 public class PlayerAnimationController : MonoBehaviour
 {
     [SerializeField] Animator anim;
 
     public bool walk;
-    public bool run;
+    public bool sprint;
 
     private void Update()
     {
@@ -17,7 +18,7 @@ public class PlayerAnimationController : MonoBehaviour
     private void ManageAnimState()
     {
         #region Walk
-        if (walk)
+        if (PlayerMovementController.Instance.state == MovementState.walking)
         {
             PlayWalkAnim(true);
         }
@@ -27,38 +28,16 @@ public class PlayerAnimationController : MonoBehaviour
         }
         #endregion
 
-        #region Run
-        if (run)
+        #region Sprint
+        if (PlayerMovementController.Instance.state == MovementState.sprinting)
         {
-            PlayRunAnim(true);
+            PlaySprintAnim(true);
         }
         else
         {
-            PlayRunAnim(false);
+            PlaySprintAnim(false);
         }
         #endregion
-    }
-
-    private static PlayerAnimationController instance = null;
-
-    void Awake()
-    {
-        if (null == instance)
-        {
-            instance = this;
-        }
-    }
-
-    public static PlayerAnimationController Instance
-    {
-        get
-        {
-            if (null == instance)
-            {
-                return null;
-            }
-            return instance;
-        }
     }
 
     private void PlayWalkAnim(bool isWalk)
@@ -73,15 +52,15 @@ public class PlayerAnimationController : MonoBehaviour
         }
     }
 
-    private void PlayRunAnim(bool isRun)
+    private void PlaySprintAnim(bool isSprint)
     {
-        if (isRun)
+        if (isSprint)
         {
-            anim.SetBool("Run", true);
+            anim.SetBool("Sprint", true);
         }
         else
         {
-            anim.SetBool("Run", false);
+            anim.SetBool("Sprint", false);
         }
     }
 }

@@ -5,18 +5,23 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
     [Header("Movement")]
+
+    float moveSpeed;
+
     [SerializeField] float walkSpeed;
+    [SerializeField] float sprintSpeed;
 
     [SerializeField] float groundDrag;
 
     [SerializeField] float jumpForce;
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
-    [SerializeField] bool readyToJump;
-    [SerializeField] bool isStopping;
+
+    bool readyToJump;
 
     [Header("Keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
+    [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
 
     [Header("Ground Check")]
     [SerializeField] float playerHeight;
@@ -31,6 +36,16 @@ public class PlayerMovementController : MonoBehaviour
     Vector3 moveDirection;
 
     Rigidbody rb;
+
+    public MovementState state;
+
+    public enum MovementState
+    {
+        ground,
+        walking,
+        sprinting,
+        air
+    }
 
     private static PlayerMovementController instance = null;
 
@@ -56,43 +71,28 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Start()
     {
-        RbInit();
+        Init();
     }
 
-    private void RbInit()
+    private void Init()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        readyToJump = true;
     }
 
     private void Update()
     {
-        ManageState();
-
         GroundCheck();
 
         MyInput();
 
         ControlSpeed();
 
+        StateHandler();
+
         HandleDrag();
-    }
-
-    private void ManageState()
-    {
-        if (grounded && (horizontalInput != 0 || verticalInput != 0)) 
-        {
-            Walk(true);
-        }
-        else
-        {
-            Walk(false);
-        }
-    }
-
-    private void Walk(bool isWalk)
-    {
-        PlayerAnimationController.Instance.walk = isWalk;
     }
 
     private void GroundCheck()
@@ -127,9 +127,9 @@ public class PlayerMovementController : MonoBehaviour
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
-        if (flatVel.magnitude > walkSpeed)
+        if (flatVel.magnitude > moveSpeed)
         {
-            Vector3 limitedVel = flatVel.normalized * walkSpeed;
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
@@ -158,6 +158,31 @@ public class PlayerMovementController : MonoBehaviour
         Move();
     }
 
+    private void StateHandler()
+    {
+        if (grounded && Input.GetKey(sprintKey))
+        {
+            state = MovementState.sprinting;
+            moveSpeed = sprintSpeed;
+        }
+
+        else if (grounded && (horizontalInput != 0 || verticalInput != 0))
+        {
+            state = MovementState.walking;
+            moveSpeed = walkSpeed;
+        }
+
+        else if (grounded)
+        {
+            state = MovementState.ground;
+        }
+
+        else
+        {
+            state = MovementState.air;
+        }
+    }
+
     private void Move()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
@@ -166,11 +191,11 @@ public class PlayerMovementController : MonoBehaviour
 
         if (grounded)
         {
-            rb.AddForce(moveDirection.normalized * walkSpeed * 10, ForceMode.Force);
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10, ForceMode.Force);
         }
         else
         {
-            rb.AddForce(moveDirection.normalized * walkSpeed * 10 * airMultiplier, ForceMode.Force);
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10 * airMultiplier, ForceMode.Force);
         }
     }
 }

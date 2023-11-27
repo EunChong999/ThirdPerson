@@ -19,16 +19,16 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
 
-    bool readyToJump;
+    [HideInInspector] public bool readyToJump;
 
     [Header("Keybinds")]
-    [SerializeField] KeyCode jumpKey = KeyCode.Space;
+    public KeyCode jumpKey = KeyCode.Space;
     [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
 
     [Header("Ground Check")]
     [SerializeField] float playerHeight;
     [SerializeField] LayerMask whatIsGround;
-    bool grounded;
+    [HideInInspector] public bool grounded;
 
     [SerializeField] Transform orientation;
 
@@ -37,7 +37,7 @@ public class PlayerMovementController : MonoBehaviour
 
     Vector3 moveDirection;
 
-    Rigidbody rb;
+    [HideInInspector] public Rigidbody rb;
 
     public MovementState state;
 
@@ -45,9 +45,7 @@ public class PlayerMovementController : MonoBehaviour
     {
         ground,
         walking,
-        backWalking,
         sprinting,
-        backSprinting,
         air
     }
 

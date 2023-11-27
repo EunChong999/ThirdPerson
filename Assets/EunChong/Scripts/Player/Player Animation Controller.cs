@@ -10,6 +10,28 @@ public class PlayerAnimationController : MonoBehaviour
     public bool walk;
     public bool sprint;
 
+    private static PlayerAnimationController instance = null;
+
+    void Awake()
+    {
+        if (null == instance)
+        {
+            instance = this;
+        }
+    }
+
+    public static PlayerAnimationController Instance
+    {
+        get
+        {
+            if (null == instance)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
+
     private void Update()
     {
         ManageAnimState();
@@ -41,6 +63,17 @@ public class PlayerAnimationController : MonoBehaviour
             PlaySprintAnim(false);
         }
         #endregion
+
+        #region JumpLoop
+        if (PlayerMovementController.Instance.state == MovementState.air)
+        {
+            PlayJumpLoopAnim(true);
+        }
+        else
+        {
+            PlayJumpLoopAnim(false);
+        }
+        #endregion
     }
 
     private void PlayWalkAnim(bool isWalk)
@@ -65,5 +98,27 @@ public class PlayerAnimationController : MonoBehaviour
         {
             anim.SetBool("Sprint", false);
         }
+    }
+
+    public void PlayJumpUpAnim()
+    {
+        anim.SetTrigger("JumpUp");
+    }
+
+    private void PlayJumpLoopAnim(bool isJumpLoop)
+    {
+        if (isJumpLoop)
+        {
+            anim.SetBool("JumpLoop", true);
+        }
+        else
+        {
+            anim.SetBool("JumpLoop", false);
+        }
+    }
+
+    public void PlayJumpDownAnim()
+    {
+        anim.SetTrigger("JumpDown");
     }
 }

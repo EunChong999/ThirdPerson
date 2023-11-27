@@ -29,13 +29,22 @@ public class CameraRotationController : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerMovementController.Instance.horizontalInput != 0 || PlayerMovementController.Instance.verticalInput != 0)
+        {
+            currentStyle = CameraStyle.Combat;
+        }
+        else
+        {
+            currentStyle = CameraStyle.Basic;
+        }
+
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir.normalized;
 
         if (currentStyle == CameraStyle.Basic)
         {
-            float horizontalInput = Input.GetAxis("Horizontal");
-            float verticalInput = Input.GetAxis("Vertical");
+            float horizontalInput = PlayerMovementController.Instance.horizontalInput;
+            float verticalInput = PlayerMovementController.Instance.verticalInput;
             Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
             if (inputDir != Vector3.zero)

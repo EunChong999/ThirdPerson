@@ -9,9 +9,9 @@ public class PlayerMovementController : MonoBehaviour
     float moveSpeed;
 
     [SerializeField] float walkSpeed;
-    [SerializeField] float backWalkSpeed;
+    [SerializeField] float slowWalkSpeed;
     [SerializeField] float sprintSpeed;
-    [SerializeField] float backSprintSpeed;
+    [SerializeField] float slowSprintSpeed;
 
     [SerializeField] float groundDrag;
 
@@ -167,13 +167,37 @@ public class PlayerMovementController : MonoBehaviour
         if (grounded && Input.GetKey(sprintKey) && (horizontalInput != 0 || verticalInput != 0))
         {
             state = MovementState.sprinting;
-            moveSpeed = sprintSpeed;
+
+            if (verticalInput > 0)
+            {
+                moveSpeed = sprintSpeed;
+            }
+            else if (verticalInput < 0 || horizontalInput != 0)
+            {
+                moveSpeed = slowSprintSpeed;
+            }
+            else
+            {
+                moveSpeed = sprintSpeed;
+            }
         }
 
         else if (grounded && (horizontalInput != 0 || verticalInput != 0))
         {
             state = MovementState.walking;
-            moveSpeed = walkSpeed;
+
+            if (verticalInput > 0)
+            {
+                moveSpeed = walkSpeed;
+            }
+            else if (verticalInput < 0 || horizontalInput != 0)
+            {
+                moveSpeed = slowWalkSpeed;
+            }
+            else
+            {
+                moveSpeed = walkSpeed;
+            }
         }
 
         else if (grounded)

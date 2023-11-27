@@ -166,30 +166,14 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (grounded && Input.GetKey(sprintKey) && (horizontalInput != 0 || verticalInput != 0))
         {
-            if (verticalInput > 0)
-            {
-                state = MovementState.sprinting;
-                moveSpeed = sprintSpeed;
-            }
-            else if (verticalInput < 0)
-            {
-                state = MovementState.backSprinting;
-                moveSpeed = backSprintSpeed;
-            }
+            state = MovementState.sprinting;
+            moveSpeed = sprintSpeed;
         }
 
         else if (grounded && (horizontalInput != 0 || verticalInput != 0))
         {
-            if (verticalInput > 0)
-            {
-                state = MovementState.walking;
-                moveSpeed = walkSpeed;
-            }
-            else if (verticalInput < 0)
-            {
-                state = MovementState.backWalking;
-                moveSpeed = backWalkSpeed;
-            }
+            state = MovementState.walking;
+            moveSpeed = walkSpeed;
         }
 
         else if (grounded)

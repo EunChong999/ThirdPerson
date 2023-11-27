@@ -28,6 +28,17 @@ public class PlayerAnimationController : MonoBehaviour
         }
         #endregion
 
+        #region BackWalk
+        if (PlayerMovementController.Instance.state == MovementState.backWalking)
+        {
+            PlayBackWalkAnim(true);
+        }
+        else
+        {
+            PlayBackWalkAnim(false);
+        }
+        #endregion
+
         #region Sprint
         if (PlayerMovementController.Instance.state == MovementState.sprinting)
         {
@@ -36,6 +47,17 @@ public class PlayerAnimationController : MonoBehaviour
         else
         {
             PlaySprintAnim(false);
+        }
+        #endregion
+
+        #region BackSprint
+        if (PlayerMovementController.Instance.state == MovementState.backSprinting)
+        {
+            PlayBackSprintAnim(true);
+        }
+        else
+        {
+            PlayBackSprintAnim(false);
         }
         #endregion
     }
@@ -52,6 +74,18 @@ public class PlayerAnimationController : MonoBehaviour
         }
     }
 
+    private void PlayBackWalkAnim(bool isBackWalk)
+    {
+        if (isBackWalk)
+        {
+            anim.SetBool("BackWalk", true);
+        }
+        else
+        {
+            anim.SetBool("BackWalk", false);
+        }
+    }
+
     private void PlaySprintAnim(bool isSprint)
     {
         if (isSprint)
@@ -61,6 +95,18 @@ public class PlayerAnimationController : MonoBehaviour
         else
         {
             anim.SetBool("Sprint", false);
+        }
+    }
+
+    private void PlayBackSprintAnim(bool isBackSprint)
+    {
+        if (isBackSprint)
+        {
+            anim.SetBool("BackSprint", true);
+        }
+        else
+        {
+            anim.SetBool("BackSprint", false);
         }
     }
 }

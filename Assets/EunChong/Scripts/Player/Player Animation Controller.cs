@@ -7,9 +7,6 @@ public class PlayerAnimationController : MonoBehaviour
 {
     [SerializeField] Animator anim;
 
-    public bool walk;
-    public bool sprint;
-
     private static PlayerAnimationController instance = null;
 
     void Awake()

@@ -28,7 +28,7 @@ public class PlayerMovementController : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] float playerHeight;
     [SerializeField] LayerMask whatIsGround;
-    [HideInInspector] public bool grounded;
+    public bool grounded;
 
     [SerializeField] Transform orientation;
 
@@ -117,6 +117,8 @@ public class PlayerMovementController : MonoBehaviour
 
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
+            print("มกวม");
+
             readyToJump = false;
 
             Jump();
@@ -212,8 +214,6 @@ public class PlayerMovementController : MonoBehaviour
     private void Move()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
-        moveDirection.Normalize();
 
         if (grounded)
         {

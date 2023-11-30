@@ -19,6 +19,8 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
 
+    [HideInInspector] public bool isMoving;
+    [HideInInspector] public bool isJumping;
     [HideInInspector] public bool readyToJump;
 
     [Header("Keybinds")]
@@ -115,6 +117,8 @@ public class PlayerMovementController : MonoBehaviour
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
+        isMoving = horizontalInput != 0 || verticalInput != 0;
+
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
             print("มกวม");
@@ -140,7 +144,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Jump()
     {
-        if (horizontalInput != 0 || verticalInput != 0)
+        if (isMoving)
         {
             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         }
@@ -164,7 +168,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void StateHandler()
     {
-        if (grounded && Input.GetKey(sprintKey) && (horizontalInput != 0 || verticalInput != 0))
+        if (grounded && Input.GetKey(sprintKey) && (isMoving))
         {
             state = MovementState.sprinting;
 
@@ -182,7 +186,7 @@ public class PlayerMovementController : MonoBehaviour
             }
         }
 
-        else if (grounded && (horizontalInput != 0 || verticalInput != 0))
+        else if (grounded && (isMoving))
         {
             state = MovementState.walking;
 

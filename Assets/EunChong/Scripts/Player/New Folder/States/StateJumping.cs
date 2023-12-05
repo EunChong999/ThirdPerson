@@ -6,7 +6,7 @@ public class StateJumping : IState
 {
     public void OperateEnter()
     {
-        Debug.Log("Jumping");
+        PlayerAnimationController.Instance.anim.SetTrigger("Jump");
     }
 
     public void OperateExit()

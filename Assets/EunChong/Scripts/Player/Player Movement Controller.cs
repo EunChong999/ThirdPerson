@@ -41,16 +41,6 @@ public class PlayerMovementController : MonoBehaviour
 
     [HideInInspector] public Rigidbody rb;
 
-    public MovementState state;
-
-    public enum MovementState
-    {
-        ground,
-        walking,
-        sprinting,
-        air
-    }
-
     private static PlayerMovementController instance = null;
 
     void Awake()
@@ -73,12 +63,32 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
-    private void Start()
+    private enum PlayerState
     {
-        Init();
+        Stand,
+        Walk,
+        Sprint,
+        Jump,
+        Crouch,
+        Slide,
+        Roll,
+        Climb,
+        Dead
     }
 
-    private void Init()
+    private StateMachine stateMachine;
+
+    //스테이트들을 보관
+    private Dictionary<PlayerState, IState> dicState = new Dictionary<PlayerState, IState>();
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        RbInit();
+        StateInit();
+    }
+
+    private void RbInit()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
@@ -86,8 +96,39 @@ public class PlayerMovementController : MonoBehaviour
         readyToJump = true;
     }
 
+    private void StateInit()
+    {
+        //상태 생성
+        IState stand = new StateStanding();
+        IState walk = new StateWalking();
+        IState sprint = new StateSprinting();
+        IState jump = new StateJumping();
+        IState crouch = new StateCrouching();
+        IState slide = new StateSliding();
+        IState roll = new StateRolling();
+        IState climb = new StateCllimbing();
+        IState dead = new StateDeading();
+
+        //키입력 등에 따라서 언제나 상태를 꺼내 쓸 수 있게 딕셔너리에 보관
+        dicState.Add(PlayerState.Stand, stand);
+        dicState.Add(PlayerState.Walk, walk);
+        dicState.Add(PlayerState.Sprint, sprint);
+        dicState.Add(PlayerState.Jump, jump);
+        dicState.Add(PlayerState.Crouch, crouch);
+        dicState.Add(PlayerState.Slide, slide);
+        dicState.Add(PlayerState.Roll, roll);
+        dicState.Add(PlayerState.Climb, climb);
+        dicState.Add(PlayerState.Dead, dead);
+
+        //기본상태는 달리기로 설정.
+        stateMachine = new StateMachine(stand);
+    }
+
     private void Update()
     {
+        //매프레임 실행해야하는 동작 호출.
+        stateMachine.DoOperateUpdate();
+
         GroundCheck();
 
         MyInput();
@@ -121,7 +162,7 @@ public class PlayerMovementController : MonoBehaviour
 
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
-            print("점프");
+            stateMachine.SetState(dicState[PlayerState.Jump]);
 
             readyToJump = false;
 
@@ -158,6 +199,8 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ResetJump()
     {
+        stateMachine.SetState(dicState[PlayerState.Stand]);
+
         readyToJump = true;
     }
 
@@ -170,8 +213,6 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (grounded && Input.GetKey(sprintKey) && (isMoving))
         {
-            state = MovementState.sprinting;
-
             if (verticalInput > 0)
             {
                 moveSpeed = sprintSpeed;
@@ -188,8 +229,6 @@ public class PlayerMovementController : MonoBehaviour
 
         else if (grounded && (isMoving))
         {
-            state = MovementState.walking;
-
             if (verticalInput > 0)
             {
                 moveSpeed = walkSpeed;
@@ -202,16 +241,6 @@ public class PlayerMovementController : MonoBehaviour
             {
                 moveSpeed = walkSpeed;
             }
-        }
-
-        else if (grounded)
-        {
-            state = MovementState.ground;
-        }
-
-        else
-        {
-            state = MovementState.air;
         }
     }
 

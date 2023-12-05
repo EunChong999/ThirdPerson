@@ -6,7 +6,7 @@ public class StateJumping : IState
 {
     public void OperateEnter()
     {
-        PlayerAnimationController.Instance.anim.SetTrigger("Jump");
+        PlayerMovementController.Instance.animator.SetTrigger("Jump");
     }
 
     public void OperateExit()

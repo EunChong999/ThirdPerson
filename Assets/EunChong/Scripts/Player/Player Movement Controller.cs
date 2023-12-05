@@ -40,7 +40,10 @@ public class PlayerMovementController : MonoBehaviour
     Vector3 moveDirection;
 
     [HideInInspector] public Rigidbody rb;
+    public Animator animator;
+    [SerializeField] Animation anim;
 
+    #region SingletonPattern
     private static PlayerMovementController instance = null;
 
     void Awake()
@@ -62,33 +65,36 @@ public class PlayerMovementController : MonoBehaviour
             return instance;
         }
     }
+    #endregion
 
+    #region StatePattern
     private enum PlayerState
     {
-        Stand,
-        Walk,
-        Sprint,
-        Jump,
-        Crouch,
-        Slide,
-        Roll,
-        Climb,
-        Dead
+        Stand, // 서있기
+        Walk, // 걷기
+        Sprint, // 달리기
+        Jump, // 점프
+        Crouch, // 웅크리기
+        Slide, // 슬라이딩
+        Roll, // 구르기
+        Climb, // 오르기
+        Dead // 죽기
     }
 
     private StateMachine stateMachine;
 
     //스테이트들을 보관
     private Dictionary<PlayerState, IState> dicState = new Dictionary<PlayerState, IState>();
+    #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-        RbInit();
+        Init();
         StateInit();
     }
 
-    private void RbInit()
+    private void Init()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
@@ -126,6 +132,9 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Update()
     {
+        animator.SetFloat("Horizontal", horizontalInput);
+        animator.SetFloat("Vertical", verticalInput);
+
         //매프레임 실행해야하는 동작 호출.
         stateMachine.DoOperateUpdate();
 
@@ -213,6 +222,8 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (grounded && Input.GetKey(sprintKey) && (isMoving))
         {
+            stateMachine.SetState(dicState[PlayerState.Sprint]);
+
             if (verticalInput > 0)
             {
                 moveSpeed = sprintSpeed;
@@ -229,6 +240,8 @@ public class PlayerMovementController : MonoBehaviour
 
         else if (grounded && (isMoving))
         {
+            stateMachine.SetState(dicState[PlayerState.Walk]);
+
             if (verticalInput > 0)
             {
                 moveSpeed = walkSpeed;
@@ -241,6 +254,11 @@ public class PlayerMovementController : MonoBehaviour
             {
                 moveSpeed = walkSpeed;
             }
+        }
+
+        else
+        {
+            stateMachine.SetState(dicState[PlayerState.Stand]);
         }
     }
 

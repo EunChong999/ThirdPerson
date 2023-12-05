@@ -36,15 +36,14 @@ public class PlayerAnimationController : MonoBehaviour
 
     private void ManageAnimState()
     {
-        anim.SetFloat("Horizontal", PlayerMovementController.Instance.horizontalInput);
-        anim.SetFloat("Vertical", PlayerMovementController.Instance.verticalInput);
+
     }
 
     private void PlayWalkAnim(bool isWalk)
     {
         if (isWalk)
         {
-            anim.SetBool("Walk", true);
+            
         }
         else
         {
@@ -56,7 +55,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         if (isSprint)
         {
-            anim.SetBool("Sprint", true);
+
         }
         else
         {

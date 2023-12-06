@@ -20,8 +20,8 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float airMultiplier;
 
     [HideInInspector] public bool isMoving;
-    [HideInInspector] public bool isJumping;
-    [HideInInspector] public bool readyToJump;
+    public bool readyToJump;
+    bool isStanding;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -40,17 +40,9 @@ public class PlayerMovementController : MonoBehaviour
     Vector3 moveDirection;
 
     [HideInInspector] public Rigidbody rb;
+    public Animator animator;
 
-    public MovementState state;
-
-    public enum MovementState
-    {
-        ground,
-        walking,
-        sprinting,
-        air
-    }
-
+    #region SingletonPattern
     private static PlayerMovementController instance = null;
 
     void Awake()
@@ -72,10 +64,33 @@ public class PlayerMovementController : MonoBehaviour
             return instance;
         }
     }
+    #endregion
 
-    private void Start()
+    #region StatePattern
+    private enum PlayerState
+    {
+        Stand, // 서있기
+        Walk, // 걷기
+        Sprint, // 달리기
+        Jump, // 점프
+        Crouch, // 웅크리기
+        Slide, // 슬라이딩
+        Roll, // 구르기
+        Climb, // 오르기
+        Dead // 죽기
+    }
+
+    private StateMachine stateMachine;
+
+    //스테이트들을 보관
+    private Dictionary<PlayerState, IState> dicState = new Dictionary<PlayerState, IState>();
+    #endregion
+
+    // Start is called before the first frame update
+    void Start()
     {
         Init();
+        StateInit();
     }
 
     private void Init()
@@ -86,9 +101,41 @@ public class PlayerMovementController : MonoBehaviour
         readyToJump = true;
     }
 
+    private void StateInit()
+    {
+        //상태 생성
+        IState stand = new States.StateStanding();
+        IState walk = new States.StateWalking();
+        IState sprint = new States.StateSprinting();
+        IState jump = new States.StateJumping();
+        IState crouch = new States.StateCrouching();
+        IState slide = new States.StateSliding();
+        IState roll = new States.StateRolling();
+        IState climb = new States.StateCllimbing();
+        IState dead = new States.StateDeading();
+
+        //키입력 등에 따라서 언제나 상태를 꺼내 쓸 수 있게 딕셔너리에 보관
+        dicState.Add(PlayerState.Stand, stand);
+        dicState.Add(PlayerState.Walk, walk);
+        dicState.Add(PlayerState.Sprint, sprint);
+        dicState.Add(PlayerState.Jump, jump);
+        dicState.Add(PlayerState.Crouch, crouch);
+        dicState.Add(PlayerState.Slide, slide);
+        dicState.Add(PlayerState.Roll, roll);
+        dicState.Add(PlayerState.Climb, climb);
+        dicState.Add(PlayerState.Dead, dead);
+
+        //기본상태는 달리기로 설정.
+        stateMachine = new StateMachine(stand);
+    }
+
     private void Update()
     {
-        GroundCheck();
+        animator.SetFloat("Horizontal", horizontalInput);
+        animator.SetFloat("Vertical", verticalInput);
+
+        //매프레임 실행해야하는 동작 호출.
+        stateMachine.DoOperateUpdate();
 
         MyInput();
 
@@ -97,11 +144,6 @@ public class PlayerMovementController : MonoBehaviour
         StateHandler();
 
         HandleDrag();
-    }
-
-    private void GroundCheck()
-    {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
     }
 
     private void HandleDrag()
@@ -121,7 +163,7 @@ public class PlayerMovementController : MonoBehaviour
 
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
-            print("점프");
+            stateMachine.SetState(dicState[PlayerState.Jump]);
 
             readyToJump = false;
 
@@ -158,6 +200,11 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ResetJump()
     {
+        if (grounded)
+        {
+            stateMachine.SetState(dicState[PlayerState.Stand]);
+        }
+
         readyToJump = true;
     }
 
@@ -170,13 +217,9 @@ public class PlayerMovementController : MonoBehaviour
     {
         if (grounded && Input.GetKey(sprintKey) && (isMoving))
         {
-            state = MovementState.sprinting;
+            stateMachine.SetState(dicState[PlayerState.Sprint]);
 
-            if (verticalInput > 0)
-            {
-                moveSpeed = sprintSpeed;
-            }
-            else if (verticalInput < 0 || horizontalInput != 0)
+            if (verticalInput < 0 || horizontalInput != 0)
             {
                 moveSpeed = slowSprintSpeed;
             }
@@ -188,13 +231,9 @@ public class PlayerMovementController : MonoBehaviour
 
         else if (grounded && (isMoving))
         {
-            state = MovementState.walking;
+            stateMachine.SetState(dicState[PlayerState.Walk]);
 
-            if (verticalInput > 0)
-            {
-                moveSpeed = walkSpeed;
-            }
-            else if (verticalInput < 0 || horizontalInput != 0)
+            if (verticalInput < 0 || horizontalInput != 0)
             {
                 moveSpeed = slowWalkSpeed;
             }
@@ -204,14 +243,12 @@ public class PlayerMovementController : MonoBehaviour
             }
         }
 
-        else if (grounded)
-        {
-            state = MovementState.ground;
-        }
-
         else
         {
-            state = MovementState.air;
+            if (grounded)
+            {
+                stateMachine.SetState(dicState[PlayerState.Stand]);
+            }
         }
     }
 

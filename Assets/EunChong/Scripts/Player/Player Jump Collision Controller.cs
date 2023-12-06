@@ -8,10 +8,9 @@ public class PlayerJumpCollisionController : MonoBehaviour
     {
         #region JumpUp
         if (other.gameObject.layer == LayerMask.NameToLayer("whatIsGround") &&
-            !PlayerMovementController.Instance.isJumping)
+            PlayerMovementController.Instance.grounded)
         {
-            PlayerAnimationController.Instance.PlayJumpUpAnim();
-            PlayerMovementController.Instance.isJumping = true;
+            PlayerMovementController.Instance.grounded = false;
         }
         #endregion
     }
@@ -20,10 +19,14 @@ public class PlayerJumpCollisionController : MonoBehaviour
     {
         #region JumpDown
         if (other.gameObject.layer == LayerMask.NameToLayer("whatIsGround") &&
-            PlayerMovementController.Instance.isJumping)
+            !PlayerMovementController.Instance.grounded)
         {
-            PlayerAnimationController.Instance.PlayJumpDownAnim();
-            PlayerMovementController.Instance.isJumping = false;
+            if (PlayerMovementController.Instance.isMoving)
+            {
+                PlayerMovementController.Instance.animator.SetTrigger("JumpOut");
+            }
+
+            PlayerMovementController.Instance.grounded = true;
         }
         #endregion
     }

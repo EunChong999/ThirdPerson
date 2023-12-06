@@ -20,7 +20,7 @@ public class StateMachine
         //예를 들어, 지금 점프중인데 또 점프를 하는 무한점프 버그를 예방할수도 있다.
         if (CurrentState == state)
         {
-            Debug.Log("현재 이미 해당 상태입니다.");
+            //Debug.Log("현재 이미 해당 상태입니다.");
             return;
         }
 

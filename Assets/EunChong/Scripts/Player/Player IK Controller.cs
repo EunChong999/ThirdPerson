@@ -8,7 +8,7 @@ using UnityEngine;
 public class PlayerIKController : MonoBehaviour
 {
     [SerializeField] Transform objToLookAt;
-    [SerializeField] float distance;
+    [SerializeField] float maxDistance;
     [SerializeField] float headWeight;
     [SerializeField] float bodyWeight;
 
@@ -19,9 +19,10 @@ public class PlayerIKController : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    private void OnAnimatorIK(int layerIndex)
+    private void OnAnimatorIK()
     {
-        if (Vector3.Distance(transform.position, objToLookAt.position) < distance)
+        if (Vector3.Distance(transform.position, objToLookAt.position) < maxDistance && 
+            PlayerMovementController.Instance.state != PlayerMovementController.State.sprinting)
         {
             anim.SetLookAtPosition(objToLookAt.position);
             anim.SetLookAtWeight(1, bodyWeight, headWeight);

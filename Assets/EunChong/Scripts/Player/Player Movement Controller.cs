@@ -21,7 +21,7 @@ public class PlayerMovementController : MonoBehaviour
 
     [HideInInspector] public bool isMoving;
     [HideInInspector] public bool isJumping;
-    [HideInInspector] public bool readyToJump;
+    public bool readyToJump;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -41,7 +41,6 @@ public class PlayerMovementController : MonoBehaviour
 
     [HideInInspector] public Rigidbody rb;
     public Animator animator;
-    [SerializeField] Animation anim;
 
     #region SingletonPattern
     private static PlayerMovementController instance = null;
@@ -105,15 +104,15 @@ public class PlayerMovementController : MonoBehaviour
     private void StateInit()
     {
         //상태 생성
-        IState stand = new StateStanding();
-        IState walk = new StateWalking();
-        IState sprint = new StateSprinting();
-        IState jump = new StateJumping();
-        IState crouch = new StateCrouching();
-        IState slide = new StateSliding();
-        IState roll = new StateRolling();
-        IState climb = new StateCllimbing();
-        IState dead = new StateDeading();
+        IState stand = new States.StateStanding();
+        IState walk = new States.StateWalking();
+        IState sprint = new States.StateSprinting();
+        IState jump = new States.StateJumping();
+        IState crouch = new States.StateCrouching();
+        IState slide = new States.StateSliding();
+        IState roll = new States.StateRolling();
+        IState climb = new States.StateCllimbing();
+        IState dead = new States.StateDeading();
 
         //키입력 등에 따라서 언제나 상태를 꺼내 쓸 수 있게 딕셔너리에 보관
         dicState.Add(PlayerState.Stand, stand);
@@ -151,7 +150,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void GroundCheck()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.05f, whatIsGround);
     }
 
     private void HandleDrag()

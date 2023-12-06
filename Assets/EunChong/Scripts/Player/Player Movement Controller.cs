@@ -20,8 +20,8 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float airMultiplier;
 
     [HideInInspector] public bool isMoving;
-    [HideInInspector] public bool isJumping;
     public bool readyToJump;
+    bool isStanding;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -137,8 +137,6 @@ public class PlayerMovementController : MonoBehaviour
         //매프레임 실행해야하는 동작 호출.
         stateMachine.DoOperateUpdate();
 
-        GroundCheck();
-
         MyInput();
 
         ControlSpeed();
@@ -146,11 +144,6 @@ public class PlayerMovementController : MonoBehaviour
         StateHandler();
 
         HandleDrag();
-    }
-
-    private void GroundCheck()
-    {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.05f, whatIsGround);
     }
 
     private void HandleDrag()
@@ -207,7 +200,10 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ResetJump()
     {
-        stateMachine.SetState(dicState[PlayerState.Stand]);
+        if (grounded)
+        {
+            stateMachine.SetState(dicState[PlayerState.Stand]);
+        }
 
         readyToJump = true;
     }
@@ -223,11 +219,7 @@ public class PlayerMovementController : MonoBehaviour
         {
             stateMachine.SetState(dicState[PlayerState.Sprint]);
 
-            if (verticalInput > 0)
-            {
-                moveSpeed = sprintSpeed;
-            }
-            else if (verticalInput < 0 || horizontalInput != 0)
+            if (verticalInput < 0 || horizontalInput != 0)
             {
                 moveSpeed = slowSprintSpeed;
             }
@@ -241,11 +233,7 @@ public class PlayerMovementController : MonoBehaviour
         {
             stateMachine.SetState(dicState[PlayerState.Walk]);
 
-            if (verticalInput > 0)
-            {
-                moveSpeed = walkSpeed;
-            }
-            else if (verticalInput < 0 || horizontalInput != 0)
+            if (verticalInput < 0 || horizontalInput != 0)
             {
                 moveSpeed = slowWalkSpeed;
             }
@@ -257,7 +245,10 @@ public class PlayerMovementController : MonoBehaviour
 
         else
         {
-            stateMachine.SetState(dicState[PlayerState.Stand]);
+            if (grounded)
+            {
+                stateMachine.SetState(dicState[PlayerState.Stand]);
+            }
         }
     }
 

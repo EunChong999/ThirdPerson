@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
@@ -7,6 +8,7 @@ using UnityEngine;
 public class PlayerIKController : MonoBehaviour
 {
     [SerializeField] Transform objToLookAt;
+    [SerializeField] float distance;
     [SerializeField] float headWeight;
     [SerializeField] float bodyWeight;
 
@@ -19,7 +21,10 @@ public class PlayerIKController : MonoBehaviour
 
     private void OnAnimatorIK(int layerIndex)
     {
-        anim.SetLookAtPosition(objToLookAt.position);
-        anim.SetLookAtWeight(1, bodyWeight, headWeight);
+        if (Vector3.Distance(transform.position, objToLookAt.position) < distance)
+        {
+            anim.SetLookAtPosition(objToLookAt.position);
+            anim.SetLookAtWeight(1, bodyWeight, headWeight);
+        }
     }
 }

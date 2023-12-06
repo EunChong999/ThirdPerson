@@ -11,7 +11,6 @@ public class PlayerJumpCollisionController : MonoBehaviour
             PlayerMovementController.Instance.grounded)
         {
             PlayerMovementController.Instance.grounded = false;
-            Debug.Log("점프업");
         }
         #endregion
     }
@@ -28,7 +27,6 @@ public class PlayerJumpCollisionController : MonoBehaviour
             }
 
             PlayerMovementController.Instance.grounded = true;
-            Debug.Log("점프다운");
         }
         #endregion
     }

@@ -21,9 +21,10 @@ public class PlayerJumpCollisionController : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("whatIsGround") &&
             !PlayerMovementController.Instance.grounded)
         {
+            // 착지했을 때 이동할 경우
             if (PlayerMovementController.Instance.isMoving)
             {
-                PlayerMovementController.Instance.animator.SetTrigger("JumpOut");
+                PlayerMovementController.Instance.animator.SetTrigger("Land");
             }
 
             PlayerMovementController.Instance.grounded = true;

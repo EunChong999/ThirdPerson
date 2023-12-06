@@ -6,6 +6,8 @@ public class PlayerMovementController : MonoBehaviour
 {
     [Header("Movement")]
 
+    [HideInInspector] public bool isMoving;
+
     float moveSpeed;
 
     [SerializeField] float walkSpeed;
@@ -15,20 +17,44 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] float groundDrag;
 
+    public enum State
+    {
+        standing,
+        walking,
+        sprinting,
+        crouching
+    }
+
+    public State state;
+
+    [SerializeField] Transform obj;
+
+    [Header("Jumping")]
+
     [SerializeField] float jumpForce;
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
 
-    [HideInInspector] public bool isMoving;
     public bool readyToJump;
-    bool isStanding;
+
+    [Header("Crouching")]
+    
+    [SerializeField] float crouchSpeed;
+
+    [SerializeField] float crouchYScale;
+    float startYScale;
+
+    [SerializeField] Transform crouchTrans;
+    Transform startTrans;
 
     [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
+
+    [SerializeField] KeyCode jumpKey = KeyCode.Space;
     [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
+    [SerializeField] KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
-    [SerializeField] float playerHeight;
+
     [SerializeField] LayerMask whatIsGround;
     public bool grounded;
 
@@ -82,11 +108,10 @@ public class PlayerMovementController : MonoBehaviour
 
     private StateMachine stateMachine;
 
-    //스테이트들을 보관
+    // 스테이트들을 보관
     private Dictionary<PlayerState, IState> dicState = new Dictionary<PlayerState, IState>();
     #endregion
 
-    // Start is called before the first frame update
     void Start()
     {
         Init();
@@ -99,6 +124,10 @@ public class PlayerMovementController : MonoBehaviour
         rb.freezeRotation = true;
 
         readyToJump = true;
+
+        startYScale = transform.localScale.y;
+
+        startTrans = transform;
     }
 
     private void StateInit()
@@ -141,26 +170,20 @@ public class PlayerMovementController : MonoBehaviour
 
         ControlSpeed();
 
-        StateHandler();
+        HandleState();
 
         HandleDrag();
     }
 
-    private void HandleDrag()
-    {
-        if (grounded)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
-    }
-
     private void MyInput()
     {
+        // 입력값
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
         isMoving = horizontalInput != 0 || verticalInput != 0;
 
+        // 점프
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
             stateMachine.SetState(dicState[PlayerState.Jump]);
@@ -171,19 +194,35 @@ public class PlayerMovementController : MonoBehaviour
 
             Invoke(nameof(ResetJump), jumpCooldown);
         }
-    }
 
-    private void ControlSpeed()
-    {
-        Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-
-        if (flatVel.magnitude > moveSpeed)
+        // 웅크리기 시작
+        if (Input.GetKeyDown(crouchKey)) 
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+            // 스케일을 줄이면 공중에 떠버리므로 아래쪽으로 몸을 낮춘다
+            transform.position = new Vector3(transform.position.x, crouchTrans.position.y, transform.position.z);
+
+            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+
+            obj.localScale = new Vector3(1, 2, 1);
+
+            Debug.Log("웅크리기 시작");
+        }
+
+        // 웅크리기 끝
+        if (Input.GetKeyUp(crouchKey))
+        {
+            // 스케일을 복귀시키면 바닥으로 꺼지므로 위쪽으로 몸을 올린다
+            transform.position = new Vector3(transform.position.x, startTrans.position.y, transform.position.z);
+
+            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+
+            obj.localScale = new Vector3(1, 1, 1);
+
+            Debug.Log("웅크리기 끝");
         }
     }
 
+    #region Jump
     private void Jump()
     {
         if (isMoving)
@@ -207,17 +246,34 @@ public class PlayerMovementController : MonoBehaviour
 
         readyToJump = true;
     }
+    #endregion
 
-    private void FixedUpdate()
+    private void ControlSpeed()
     {
-        Move();
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+
+        // 이동 속력이 이동 속도보다 클 경우, 속도를 제한
+        if (flatVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
     }
 
-    private void StateHandler()
+    private void HandleState()
     {
-        if (grounded && Input.GetKey(sprintKey) && (isMoving))
+        if (Input.GetKey(crouchKey))
+        {
+            state = State.crouching;
+
+            moveSpeed = crouchSpeed;
+        }
+
+        if (grounded && Input.GetKey(sprintKey) && isMoving)
         {
             stateMachine.SetState(dicState[PlayerState.Sprint]);
+
+            state = State.sprinting;
 
             if (verticalInput < 0 || horizontalInput != 0)
             {
@@ -229,9 +285,11 @@ public class PlayerMovementController : MonoBehaviour
             }
         }
 
-        else if (grounded && (isMoving))
+        else if (grounded && isMoving)
         {
             stateMachine.SetState(dicState[PlayerState.Walk]);
+
+            state = State.walking;
 
             if (verticalInput < 0 || horizontalInput != 0)
             {
@@ -248,8 +306,23 @@ public class PlayerMovementController : MonoBehaviour
             if (grounded)
             {
                 stateMachine.SetState(dicState[PlayerState.Stand]);
+
+                state = State.standing;
             }
         }
+    }
+
+    private void HandleDrag()
+    {
+        if (grounded)
+            rb.drag = groundDrag;
+        else
+            rb.drag = 0;
+    }
+
+    private void FixedUpdate()
+    {
+        Move();
     }
 
     private void Move()

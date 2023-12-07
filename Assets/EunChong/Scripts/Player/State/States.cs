@@ -26,17 +26,17 @@ public class States
     {
         public void OperateEnter()
         {
-
+            PlayerMovementController.Instance.animator.SetBool("Crouch", true);
         }
 
         public void OperateExit()
         {
-
+            PlayerMovementController.Instance.animator.SetBool("Crouch", false);
         }
 
         public void OperateUpdate()
         {
-
+            PlayerMovementController.Instance.animator.SetBool("Crouch", true);
         }
     }
 
@@ -126,7 +126,7 @@ public class States
 
         public void OperateUpdate()
         {
-
+            PlayerMovementController.Instance.animator.SetBool("Sprint", true);
         }
     }
 
@@ -162,7 +162,7 @@ public class States
 
         public void OperateUpdate()
         {
-
+            PlayerMovementController.Instance.animator.SetBool("Walk", true);
         }
     }
 

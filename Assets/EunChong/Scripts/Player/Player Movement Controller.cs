@@ -21,7 +21,8 @@ public class PlayerMovementController : MonoBehaviour
         standing,
         walking,
         sprinting,
-        crouching
+        crouching,
+        falling
     }
 
     public State state;
@@ -40,8 +41,6 @@ public class PlayerMovementController : MonoBehaviour
 
     [SerializeField] float crouchYScale;
     float startYScale;
-
-    [SerializeField] Transform playerScaler;
 
     [Header("Keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
@@ -97,7 +96,8 @@ public class PlayerMovementController : MonoBehaviour
         Slide, // 슬라이딩
         Roll, // 구르기
         Climb, // 오르기
-        Dead // 죽기
+        Dead, // 죽기
+        Fall
     }
 
     private StateMachine stateMachine;
@@ -119,10 +119,7 @@ public class PlayerMovementController : MonoBehaviour
 
         readyToJump = true;
 
-        playerScaler.parent = null;
-        transform.parent = playerScaler;
-
-        startYScale = playerScaler.localScale.y;
+        startYScale = transform.localScale.y;
     }
 
     private void StateInit()
@@ -137,6 +134,7 @@ public class PlayerMovementController : MonoBehaviour
         IState roll = new States.StateRolling();
         IState climb = new States.StateCllimbing();
         IState dead = new States.StateDeading();
+        IState fall = new States.StateFalling();
 
         //키입력 등에 따라서 언제나 상태를 꺼내 쓸 수 있게 딕셔너리에 보관
         dicState.Add(PlayerState.Stand, stand);
@@ -148,6 +146,7 @@ public class PlayerMovementController : MonoBehaviour
         dicState.Add(PlayerState.Roll, roll);
         dicState.Add(PlayerState.Climb, climb);
         dicState.Add(PlayerState.Dead, dead);
+        dicState.Add(PlayerState.Fall, fall);
 
         //기본상태는 달리기로 설정.
         stateMachine = new StateMachine(stand);
@@ -193,7 +192,9 @@ public class PlayerMovementController : MonoBehaviour
         // 웅크리기 시작
         if (Input.GetKeyDown(crouchKey) && grounded) 
         {
-            playerScaler.localScale = new Vector3(playerScaler.localScale.x, crouchYScale, playerScaler.localScale.z);
+            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+
+            transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
 
             obj.localScale = new Vector3(1, 2, 1);
         }
@@ -201,7 +202,9 @@ public class PlayerMovementController : MonoBehaviour
         // 웅크리기 끝
         if (Input.GetKeyUp(crouchKey))
         {
-            playerScaler.localScale = new Vector3(playerScaler.localScale.x, startYScale, playerScaler.localScale.z);
+            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+
+            transform.position = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
 
             obj.localScale = new Vector3(1, 1, 1);
         }
@@ -224,11 +227,6 @@ public class PlayerMovementController : MonoBehaviour
 
     private void ResetJump()
     {
-        if (grounded)
-        {
-            stateMachine.SetState(dicState[PlayerState.Stand]);
-        }
-
         readyToJump = true;
     }
     #endregion
@@ -247,7 +245,14 @@ public class PlayerMovementController : MonoBehaviour
 
     private void HandleState()
     {
-        if (Input.GetKey(crouchKey) && grounded)
+        if (!grounded) 
+        {
+            stateMachine.SetState(dicState[PlayerState.Fall]);
+
+            state = State.falling;
+        }
+
+        else if (Input.GetKey(crouchKey) && grounded)
         {
             stateMachine.SetState(dicState[PlayerState.Crouch]);
 
@@ -290,12 +295,9 @@ public class PlayerMovementController : MonoBehaviour
 
         else
         {
-            if (grounded)
-            {
-                stateMachine.SetState(dicState[PlayerState.Stand]);
+            stateMachine.SetState(dicState[PlayerState.Stand]);
 
-                state = State.standing;
-            }
+            state = State.standing;
         }
     }
 

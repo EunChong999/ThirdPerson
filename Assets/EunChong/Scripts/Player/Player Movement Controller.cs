@@ -5,10 +5,9 @@ using UnityEngine;
 public class PlayerMovementController : MonoBehaviour
 {
     [Header("Movement")]
+    [SerializeField] float moveSpeed;
 
     [HideInInspector] public bool isMoving;
-
-    float moveSpeed;
 
     [SerializeField] float walkSpeed;
     [SerializeField] float slowWalkSpeed;
@@ -30,7 +29,6 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] Transform obj;
 
     [Header("Jumping")]
-
     [SerializeField] float jumpForce;
     [SerializeField] float jumpCooldown;
     [SerializeField] float airMultiplier;
@@ -38,7 +36,6 @@ public class PlayerMovementController : MonoBehaviour
     public bool readyToJump;
 
     [Header("Crouching")]
-    
     [SerializeField] float crouchSpeed;
 
     [SerializeField] float crouchYScale;
@@ -47,13 +44,11 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] Transform playerScaler;
 
     [Header("Keybinds")]
-
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
     [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
-
     [SerializeField] LayerMask whatIsGround;
     public bool grounded;
 
@@ -196,13 +191,11 @@ public class PlayerMovementController : MonoBehaviour
         }
 
         // 旷农府扁 矫累
-        if (Input.GetKeyDown(crouchKey)) 
+        if (Input.GetKeyDown(crouchKey) && grounded) 
         {
             playerScaler.localScale = new Vector3(playerScaler.localScale.x, crouchYScale, playerScaler.localScale.z);
 
             obj.localScale = new Vector3(1, 2, 1);
-
-            Debug.Log("旷农府扁 矫累");
         }
 
         // 旷农府扁 场
@@ -211,8 +204,6 @@ public class PlayerMovementController : MonoBehaviour
             playerScaler.localScale = new Vector3(playerScaler.localScale.x, startYScale, playerScaler.localScale.z);
 
             obj.localScale = new Vector3(1, 1, 1);
-
-            Debug.Log("旷农府扁 场");
         }
     }
 
@@ -256,14 +247,16 @@ public class PlayerMovementController : MonoBehaviour
 
     private void HandleState()
     {
-        if (Input.GetKey(crouchKey))
+        if (Input.GetKey(crouchKey) && grounded)
         {
+            stateMachine.SetState(dicState[PlayerState.Crouch]);
+
             state = State.crouching;
 
             moveSpeed = crouchSpeed;
         }
 
-        if (grounded && Input.GetKey(sprintKey) && isMoving)
+        else if (grounded && Input.GetKey(sprintKey) && isMoving)
         {
             stateMachine.SetState(dicState[PlayerState.Sprint]);
 

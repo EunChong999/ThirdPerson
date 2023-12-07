@@ -26,7 +26,7 @@ public class States
     {
         public void OperateEnter()
         {
-            PlayerMovementController.Instance.animator.SetBool("Crouch", true);
+
         }
 
         public void OperateExit()
@@ -166,6 +166,23 @@ public class States
         }
     }
 
+    public class StateFalling : IState
+    {
+        public void OperateEnter()
+        {
+
+        }
+
+        public void OperateExit()
+        {
+            PlayerMovementController.Instance.animator.SetBool("Fall", false);
+        }
+
+        public void OperateUpdate()
+        {
+            PlayerMovementController.Instance.animator.SetBool("Fall", true);
+        }
+    }
 }
 
 

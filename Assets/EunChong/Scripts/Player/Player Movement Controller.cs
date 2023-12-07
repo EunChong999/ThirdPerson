@@ -44,8 +44,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float crouchYScale;
     float startYScale;
 
-    [SerializeField] Transform crouchTrans;
-    Transform startTrans;
+    [SerializeField] Transform playerScaler;
 
     [Header("Keybinds")]
 
@@ -125,9 +124,10 @@ public class PlayerMovementController : MonoBehaviour
 
         readyToJump = true;
 
-        startYScale = transform.localScale.y;
+        playerScaler.parent = null;
+        transform.parent = playerScaler;
 
-        startTrans = transform;
+        startYScale = playerScaler.localScale.y;
     }
 
     private void StateInit()
@@ -198,10 +198,7 @@ public class PlayerMovementController : MonoBehaviour
         // 웅크리기 시작
         if (Input.GetKeyDown(crouchKey)) 
         {
-            // 스케일을 줄이면 공중에 떠버리므로 아래쪽으로 몸을 낮춘다
-            transform.position = new Vector3(transform.position.x, crouchTrans.position.y, transform.position.z);
-
-            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+            playerScaler.localScale = new Vector3(playerScaler.localScale.x, crouchYScale, playerScaler.localScale.z);
 
             obj.localScale = new Vector3(1, 2, 1);
 
@@ -211,10 +208,7 @@ public class PlayerMovementController : MonoBehaviour
         // 웅크리기 끝
         if (Input.GetKeyUp(crouchKey))
         {
-            // 스케일을 복귀시키면 바닥으로 꺼지므로 위쪽으로 몸을 올린다
-            transform.position = new Vector3(transform.position.x, startTrans.position.y, transform.position.z);
-
-            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+            playerScaler.localScale = new Vector3(playerScaler.localScale.x, startYScale, playerScaler.localScale.z);
 
             obj.localScale = new Vector3(1, 1, 1);
 

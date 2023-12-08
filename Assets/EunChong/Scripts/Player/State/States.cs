@@ -62,7 +62,7 @@ public class States
     {
         public void OperateEnter()
         {
-            PlayerMovementController.Instance.animator.SetTrigger("Jump");
+            PlayerMovementController.Instance.animator.SetTrigger("JumpUp");
         }
 
         public void OperateExit()

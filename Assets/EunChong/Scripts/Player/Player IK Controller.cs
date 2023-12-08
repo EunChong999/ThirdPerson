@@ -21,11 +21,10 @@ public class PlayerIKController : MonoBehaviour
 
     private void OnAnimatorIK()
     {
-        if (Vector3.Distance(transform.position, objToLookAt.position) < maxDistance && 
-            PlayerMovementController.Instance.state != PlayerMovementController.State.sprinting)
-        {
-            anim.SetLookAtPosition(objToLookAt.position);
-            anim.SetLookAtWeight(1, bodyWeight, headWeight);
-        }
+        //if (Vector3.Distance(transform.position, objToLookAt.position) < maxDistance)
+        //{
+        //    anim.SetLookAtPosition(objToLookAt.position);
+        //    anim.SetLookAtWeight(1, bodyWeight, headWeight);
+        //}
     }
 }

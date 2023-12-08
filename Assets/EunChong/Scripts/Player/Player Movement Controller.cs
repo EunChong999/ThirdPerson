@@ -42,6 +42,8 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] float crouchYScale;
     float startYScale;
 
+    public bool isCrouching;
+
     [Header("Keybinds")]
     [SerializeField] KeyCode jumpKey = KeyCode.Space;
     [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
@@ -50,6 +52,8 @@ public class PlayerMovementController : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] LayerMask whatIsGround;
     public bool grounded;
+
+    public bool isLanding;
 
     [SerializeField] Transform orientation;
 
@@ -190,8 +194,10 @@ public class PlayerMovementController : MonoBehaviour
         }
 
         // 旷农府扁 矫累
-        if (Input.GetKeyDown(crouchKey) && grounded) 
+        if (Input.GetKeyDown(crouchKey)) 
         {
+            isCrouching = true;
+
             transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
 
             transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
@@ -202,6 +208,8 @@ public class PlayerMovementController : MonoBehaviour
         // 旷农府扁 场
         if (Input.GetKeyUp(crouchKey))
         {
+            isCrouching = false;
+
             transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
 
             transform.position = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
@@ -252,7 +260,7 @@ public class PlayerMovementController : MonoBehaviour
             state = State.falling;
         }
 
-        else if (Input.GetKey(crouchKey) && grounded)
+        else if (Input.GetKey(crouchKey))
         {
             stateMachine.SetState(dicState[PlayerState.Crouch]);
 

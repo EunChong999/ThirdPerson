@@ -10,7 +10,6 @@ public class PlayerJumpCollisionController : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("whatIsGround") &&
             PlayerMovementController.Instance.grounded)
         {
-            PlayerMovementController.Instance.isLanding = false;
             PlayerMovementController.Instance.grounded = false;
         }
         #endregion
@@ -23,7 +22,9 @@ public class PlayerJumpCollisionController : MonoBehaviour
         {
             if (!PlayerMovementController.Instance.grounded)
             {
+                PlayerMovementController.Instance.isLanding = false;
                 PlayerMovementController.Instance.animator.SetTrigger("JumpDown");
+                PlayerMovementController.Instance.grounded = true;
             }
             else
             {
@@ -39,7 +40,7 @@ public class PlayerJumpCollisionController : MonoBehaviour
                 }
             }
 
-            PlayerMovementController.Instance.grounded = true;
+
         }
         #endregion
     }

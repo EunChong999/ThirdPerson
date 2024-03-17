@@ -11,6 +11,7 @@ public class PlayerJumpCollisionController : MonoBehaviour
             PlayerMovementController.Instance.grounded)
         {
             PlayerMovementController.Instance.grounded = false;
+            PlayerMovementController.Instance.animator.SetBool("Land", false);
         }
         #endregion
     }
@@ -32,15 +33,10 @@ public class PlayerJumpCollisionController : MonoBehaviour
                 if (PlayerMovementController.Instance.isMoving ||
                     PlayerMovementController.Instance.isCrouching)
                 {
-                    if (!PlayerMovementController.Instance.isLanding)
-                    {
-                        PlayerMovementController.Instance.animator.SetTrigger("Land");
-                        PlayerMovementController.Instance.isLanding = true;
-                    }
+                    PlayerMovementController.Instance.animator.SetTrigger("Land");
+                    PlayerMovementController.Instance.isLanding = true;
                 }
             }
-
-
         }
         #endregion
     }

@@ -257,6 +257,11 @@ public class PlayerMovementController : MonoBehaviour
         {
             stateMachine.SetState(dicState[PlayerState.Fall]);
 
+            if (verticalInput != 0 || horizontalInput != 0)
+            {
+                moveSpeed = slowSprintSpeed;
+            }
+
             state = State.falling;
         }
 
